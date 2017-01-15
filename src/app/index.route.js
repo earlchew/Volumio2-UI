@@ -29,13 +29,17 @@ function routerConfig ($stateProvider, $urlRouterProvider,
         //NOTE this resolver init also global services like toast
         socketResolver: ($rootScope, $http, $window, socketService, ripperService, modalListenerService,
             toastMessageService, uiSettingsService, updaterService) => {
-          let localhostApiURL = `http://${$window.location.hostname}/api`;
-          return $http.get(localhostApiURL + '/host')
+          let urlProtocol = `${$window.location.protocol}`;
+          let urlHostname = `${$window.location.hostname}`;
+          let urlPort = `${$window.location.port}`;
+          let url = urlProtocol + "//" + urlHostname + (
+                  urlPort ? ":" + urlPort : "");
+          return $http.get(url + '/api/host')
             .then((response) => {
               console.info('IP from API', response);
               $rootScope.initConfig = response.data;
-              socketService.host  = response.data.host;
-              socketService.host2 = response.data.host2;
+              socketService.host  = url;
+              socketService.host2 = url;
             }, () => {
               //Fallback socket
               console.info('Dev mode: IP from local-config.json');
